@@ -11,9 +11,9 @@ client = InferenceClient("Qwen/Qwen2.5-7B-Instruct", token=hf_token)
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 KB_FILES = {
-    "Gaining Weight": "gaining_weight_kb.txt",
-    "Maintaining Weight": "maintaining_weight_kb.txt",
-    "Losing Weight": "losing_weight_kb.txt",
+    "Gaining Weight": "knowledgeGain.txt",
+    "Maintaining Weight": "knowledgeMaintain.txt",
+    "Losing Weight": "knowledgeLose.txt",
 }
 
 def load_and_chunk(filepath):

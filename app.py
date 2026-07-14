@@ -83,7 +83,7 @@ chatbot = gr.ChatInterface(
             label="What's your goal?",
         )
     ],
-    title="Nutrition & Fitness Chatbot",
+    title="Health Hub",
     description="Select your goal below, then ask a question. The chatbot will pull relevant information from a knowledge base tailored to your goal.",
 )
 

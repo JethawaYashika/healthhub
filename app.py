@@ -5,20 +5,6 @@ from sentence_transformers import SentenceTransformer
 import torch
 import numpy as np
 
-USER_DATABASE = {
-    "admin": "secret123",
-    "alice": "fitness2026",
-    "bob": "healthy789"
-}
-
-def verify_login(username, password):
-    """Checks if the username exists and matches the password exactly."""
-    username = username.strip()
-    password = password.strip()
-    if username in USER_DATABASE and USER_DATABASE[username] == password:
-        return True
-    return False
-
 hf_token = os.environ.get("HF_TOKEN")
 client = InferenceClient("Qwen/Qwen2.5-7B-Instruct", token=hf_token)
 
@@ -102,8 +88,4 @@ chatbot = gr.ChatInterface(
 )
 
 if __name__ == "__main__":
-    # Passing the verify_login function forces the default Username/Password screen
-    chatbot.launch(
-        auth=verify_login,
-        auth_message="Please log in with your Username and Password to access HealthHub."
-    )
+    chatbot.launch()

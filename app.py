@@ -1,7 +1,9 @@
 import gradio as gr
+import os
 from huggingface_hub import InferenceClient
+hf_token = os.environ.get("HF_TOKEN")
 
-client = InferenceClient("meta-llama/Llama-3.1-8B-Instruct", token = "HF_TOKEN")
+client = InferenceClient("meta-llama/Llama-3.1-8B-Instruct", token = "hf_token")
 
 def respond(message, history):
     

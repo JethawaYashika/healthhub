@@ -1,7 +1,7 @@
 import gradio as gr
 from huggingface_hub import InferenceClient
 
-client = InferenceClient("Qwen/Qwen2.5-7B-Instruct", token = "HF_TOKEN")
+client = InferenceClient("meta-llama/Llama-3.1-8B-Instruct", token = "HF_TOKEN")
 
 def respond(message, history):
     

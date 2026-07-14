@@ -14,7 +14,7 @@ def respond(message, history):
     
     response = client.chat_completion(
         messages,
-        max_tokens=20
+        max_tokens=20,
         temperature = .2
     )
     

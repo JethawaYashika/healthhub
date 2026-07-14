@@ -3,7 +3,7 @@ import os
 from huggingface_hub import InferenceClient
 hf_token = os.environ.get("HF_TOKEN")
 
-client = InferenceClient("Qwen/Qwen2.5-7B-Instruct", token = "hf_token")
+client = InferenceClient("Qwen/Qwen2.5-7B-Instruct", token = hf_token)
 
 def respond(message, history):
     

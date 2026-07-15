@@ -272,13 +272,12 @@ body {
 
 /* All groups get cream background */
 .gradio-group {
-    background: #D8DDD8 !important;
-    border-radius: 24px !important;
-    padding: 35px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
-    border: none !important;
-    margin-bottom: 20px !important;
-}
+ .gradio-group,
+ .gradio-group .block,
+.dark .gradio-group, 
+.dark .gradio-group .block { 
+    background-color: #D8DDD8 !important;
+    border-color: #D8DDD8 !important;}
 
 /* Markdown headings */
 .gradio-markdown h3 {

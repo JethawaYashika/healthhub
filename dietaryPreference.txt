@@ -1,0 +1,11 @@
+Dietary_Preference,Primary_Definition,Allowed_Foods,Restricted_Foods,Goal_or_Reason
+Vegan,Avoids all animal products,Plants, grains, legumes, nuts, seeds, Meat, poultry, seafood, dairy, eggs, honey,Ethics, environment, or health
+Vegetarian,Avoids all meat but may consume animal byproducts,Fruits, vegetables, grains, nuts, seeds, dairy, eggs,Meat, poultry, seafood, gelatin,Animal welfare, health, or religion
+Pescatarian,A vegetarian diet that includes seafood,Seafood, fish, plants, grains, legumes, dairy, eggs,Meat, poultry, red meat,Heart health, balanced nutrition
+Keto,Low-carb, high-fat diet aiming to burn fat for energy,Meats, fish, eggs, dairy, nuts, seeds, healthy oils,Grains, sugar, high-carb fruits, starchy vegetables,Weight loss, blood sugar management
+Paleo,Emulates the diet of early humans,Meats, fish, eggs, nuts, seeds, fruits, vegetables,Grains, legumes, dairy, refined sugar, processed foods,Nutrient density, avoiding modern additives
+Gluten-Free,Eliminates gluten protein entirely,Naturally gluten-free foods (meat, fish, fruit, vegetables),Wheat, barley, rye, malt, most processed baked goods,Celiac disease, gluten sensitivity, inflammation
+Dairy-Free,Avoids milk and milk-based products,Plant milks, fruits, vegetables, meat, grains,Milk, cheese, butter, yogurt, whey, casein,Lactose intolerance, veganism, dairy allergies
+Low-FODMAP,Limits specific fermentable carbs that cause digestive issues,Meats, eggs, certain fruits/veggies, rice, oats,High-FODMAP foods (onions, garlic, wheat, apples),Irritable Bowel Syndrome (IBS) symptom relief
+Mediterranean,Plant-heavy diet with healthy fats and lean proteins,Olive oil, vegetables, fruits, whole grains, seafood,Red meat, processed sugars, trans fats,Heart health, longevity
+Kosher,Diet adhering strictly to Jewish dietary laws,Certified kosher meat/dairy, specific fish, produce,Pork, shellfish, mixing meat and dairy,Religious observance

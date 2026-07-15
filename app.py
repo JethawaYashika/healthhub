@@ -220,7 +220,7 @@ def complete_signup(username_state, password_state, name, goal, height, weight, 
 # -------------------------------------------------------------------
 # 6. Chat response function
 # -------------------------------------------------------------------
-def respond(message, history, profile):
+def respond(message, history, profile, max_response_length=1500):
     goal_name = profile.get("goal", "Maintaining Weight")
     dietary_prefs = profile.get("dietary_preferences", [])
     prefs_str = ", ".join(dietary_prefs) if dietary_prefs else "No specific dietary preferences"
@@ -245,28 +245,28 @@ def respond(message, history, profile):
 
     response = client.chat_completion(
         messages,
-        max_tokens=300,
+        max_tokens=int(max_response_length),
         temperature=0.2,
     )
     return response.choices[0].message.content.strip()
 
-def user_send(message, history, profile):
+def user_send(message, history, profile, max_response_length):
     if not message.strip():
         return history, ""
     history = history + [{"role": "user", "content": message}]
-    reply = respond(message, history[:-1], profile)
+    reply = respond(message, history[:-1], profile, max_response_length)
     history = history + [{"role": "assistant", "content": reply}]
     return history, ""
 
 # -------------------------------------------------------------------
 # 7. Gradio interface
 # -------------------------------------------------------------------
-with gr.Blocks(title="Nutrition & Fitness Chatbot") as demo:
+with gr.Blocks(title="HealthHub") as demo:
     profile_state = gr.State({})
     username_state = gr.State("")
     password_state = gr.State("")
 
-    gr.Markdown("# 🥗 Nutrition & Fitness Chatbot")
+    gr.Markdown("# 🏥 HealthHub")
 
     # --- Screen 1: login / signup ---
     with gr.Group(visible=True) as auth_group:
@@ -312,7 +312,16 @@ with gr.Blocks(title="Nutrition & Fitness Chatbot") as demo:
     with gr.Group(visible=False) as chat_group:
         chatbot_ui = gr.Chatbot(label="Chat")
         msg_input = gr.Textbox(label="Your message", placeholder="Ask me something...")
-        send_btn = gr.Button("Send")
+        with gr.Row():
+            send_btn = gr.Button("Send", scale=1)
+            response_length = gr.Slider(
+                minimum=300,
+                maximum=2000,
+                value=1500,
+                step=100,
+                label="Response Length",
+                scale=2,
+            )
 
     # --- Wiring ---
     login_btn.click(
@@ -335,12 +344,12 @@ with gr.Blocks(title="Nutrition & Fitness Chatbot") as demo:
 
     send_btn.click(
         user_send,
-        inputs=[msg_input, chatbot_ui, profile_state],
+        inputs=[msg_input, chatbot_ui, profile_state, response_length],
         outputs=[chatbot_ui, msg_input],
     )
     msg_input.submit(
         user_send,
-        inputs=[msg_input, chatbot_ui, profile_state],
+        inputs=[msg_input, chatbot_ui, profile_state, response_length],
         outputs=[chatbot_ui, msg_input],
     )
 

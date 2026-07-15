@@ -10,6 +10,7 @@ client = InferenceClient("Qwen/Qwen2.5-7B-Instruct", token=hf_token)
 
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
+
 KB_FILES = {
     "Gaining Weight": "knowledgeGain.txt",
     "Maintaining Weight": "knowledgeMaintain.txt",
@@ -62,6 +63,16 @@ def save_profiles(profiles):
     with open(PROFILE_FILE, "w", encoding="utf-8") as f:
         json.dump(profiles, f, indent=2)
 
+def history_to_messages(history):
+    """Convert [[user_msg, bot_msg], ...] tuple history into the
+    role-based dict format the chat completion API expects."""
+    messages = []
+    for user_msg, bot_msg in history:
+        if user_msg:
+            messages.append({"role": "user", "content": user_msg})
+        if bot_msg:
+            messages.append({"role": "assistant", "content": bot_msg})
+    return messages
 
 def respond(message, history, profile):
     goal_name = profile.get("goal", "Maintaining Weight")
@@ -79,7 +90,7 @@ def respond(message, history, profile):
     )
 
     messages = [{"role": "system", "content": system_prompt}]
-    messages.extend(history)
+    messages.extend(history_to_messages(history))
     messages.append({"role": "user", "content": message})
 
     response = client.chat_completion(
@@ -92,10 +103,10 @@ def respond(message, history, profile):
 def user_send(message, history, profile):
     if not message.strip():
         return history, ""
-    history = history + [{"role": "user", "content": message}]
-    reply = respond(message, history[:-1], profile)
-    history = history + [{"role": "assistant", "content": reply}]
+    reply = respond(message, history, profile)
+    history = history + [[message, reply]]
     return history, ""
+
 
 def handle_login(profile: gr.OAuthProfile | None):
     if profile is None:
@@ -124,7 +135,7 @@ def handle_login(profile: gr.OAuthProfile | None):
             "",
             saved_profile,
             username,
-            [{"role": "assistant", "content": greeting}],
+            [[None, greeting]],
         )
     else:
         return (
@@ -154,14 +165,15 @@ def save_new_profile(username_state, name, goal, height, weight, age, gender):
         f"Thanks, {profile['name']}! I've saved your info and I'll remember "
         f"it next time you sign in. Your goal is **{goal}** — ask me anything!"
     )
-    history = [{"role": "assistant", "content": greeting}]
+    history = [[None, greeting]]
 
     return (
-        gr.update(visible=False),  
-        gr.update(visible=True),   
-        profile,                  
-        history,                   
+        gr.update(visible=False),  # intake_group
+        gr.update(visible=True),   # chat_group
+        profile,                   # profile_state
+        history,                   # chatbot_ui
     )
+
 
 with gr.Blocks(title="Nutrition & Fitness Chatbot") as demo:
     profile_state = gr.State({})
@@ -171,7 +183,7 @@ with gr.Blocks(title="Nutrition & Fitness Chatbot") as demo:
     gr.LoginButton()
     login_status = gr.Markdown("")
 
-    # --- Intake form (shown only for first-time users) ---
+   
     with gr.Group(visible=False) as intake_group:
         gr.Markdown("### Tell us a bit about yourself")
         name_input = gr.Textbox(label="Name")
@@ -188,11 +200,12 @@ with gr.Blocks(title="Nutrition & Fitness Chatbot") as demo:
         )
         intake_submit = gr.Button("Save & Start Chatting", variant="primary")
 
+
     with gr.Group(visible=False) as chat_group:
-        chatbot_ui = gr.Chatbot(type="messages", label="Chat")
+        chatbot_ui = gr.Chatbot(label="Chat")
         msg_input = gr.Textbox(label="Your message", placeholder="Ask me something...")
         send_btn = gr.Button("Send")
-
+        
     demo.load(
         handle_login,
         inputs=None,

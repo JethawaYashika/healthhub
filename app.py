@@ -1,6 +1,7 @@
 import gradio as gr
 import os
 import json
+import hashlib
 from huggingface_hub import InferenceClient
 from sentence_transformers import SentenceTransformer
 import torch
@@ -8,9 +9,14 @@ import torch
 hf_token = os.environ.get("HF_TOKEN")
 client = InferenceClient("Qwen/Qwen2.5-7B-Instruct", token=hf_token)
 
+# -------------------------------------------------------------------
+# 1. Load the embedding model (used to turn text into vectors)
+# -------------------------------------------------------------------
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
-
+# -------------------------------------------------------------------
+# 2. Load and chunk each knowledge base file
+# -------------------------------------------------------------------
 KB_FILES = {
     "Gaining Weight": "knowledgeGain.txt",
     "Maintaining Weight": "knowledgeMaintain.txt",
@@ -32,7 +38,9 @@ for goal_name, filepath in KB_FILES.items():
         "embeddings": embeddings,
     }
 
-
+# -------------------------------------------------------------------
+# 3. Retrieval function
+# -------------------------------------------------------------------
 def retrieve_context(query, goal_name, top_k=3):
     kb = knowledge_bases[goal_name]
     chunks = kb["chunks"]
@@ -50,30 +58,147 @@ def retrieve_context(query, goal_name, top_k=3):
     relevant_chunks = [chunks[i] for i in top_indices]
     return "\n\n".join(relevant_chunks)
 
+# -------------------------------------------------------------------
+# 4. Self-contained user accounts (no Hugging Face login required)
+#    Passwords are hashed before storage — a reasonable baseline for
+#    a class project, though not the same as production-grade auth.
+#
+#    NOTE: On the free tier of Hugging Face Spaces, local files are
+#    wiped when the Space restarts/sleeps unless you enable
+#    "Persistent Storage" in your Space settings.
+# -------------------------------------------------------------------
+USERS_FILE = "users.json"
 
-PROFILE_FILE = "user_profiles.json"
-
-def load_profiles():
-    if os.path.exists(PROFILE_FILE):
-        with open(PROFILE_FILE, "r", encoding="utf-8") as f:
+def load_users():
+    if os.path.exists(USERS_FILE):
+        with open(USERS_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     return {}
 
-def save_profiles(profiles):
-    with open(PROFILE_FILE, "w", encoding="utf-8") as f:
-        json.dump(profiles, f, indent=2)
+def save_users(users):
+    with open(USERS_FILE, "w", encoding="utf-8") as f:
+        json.dump(users, f, indent=2)
 
-def history_to_messages(history):
-    """Convert [[user_msg, bot_msg], ...] tuple history into the
-    role-based dict format the chat completion API expects."""
-    messages = []
-    for user_msg, bot_msg in history:
-        if user_msg:
-            messages.append({"role": "user", "content": user_msg})
-        if bot_msg:
-            messages.append({"role": "assistant", "content": bot_msg})
-    return messages
+def hash_password(password):
+    return hashlib.sha256(password.encode("utf-8")).hexdigest()
 
+# -------------------------------------------------------------------
+# 5. Login / signup logic
+# -------------------------------------------------------------------
+def check_login(username, password):
+    username = (username or "").strip()
+    users = load_users()
+
+    if not username or not password:
+        return (
+            gr.update(visible=True),   # auth_group
+            gr.update(visible=False),  # signup_group
+            gr.update(visible=False),  # chat_group
+            {},                        # profile_state
+            "Please enter both a username and password.",
+            [],                        # chatbot_ui
+        )
+
+    if username not in users:
+        return (
+            gr.update(visible=True),
+            gr.update(visible=False),
+            gr.update(visible=False),
+            {},
+            "No account found for that username. Click Sign Up to create one.",
+            [],
+        )
+
+    if users[username]["password_hash"] != hash_password(password):
+        return (
+            gr.update(visible=True),
+            gr.update(visible=False),
+            gr.update(visible=False),
+            {},
+            "Incorrect password. Please try again.",
+            [],
+        )
+
+    profile = users[username]["profile"]
+    greeting = (
+        f"Welcome back, {profile['name']}! I remember your goal is "
+        f"**{profile['goal']}**. Ask me anything!"
+    )
+    history = [{"role": "assistant", "content": greeting}]
+    return (
+        gr.update(visible=False),
+        gr.update(visible=False),
+        gr.update(visible=True),
+        profile,
+        "",
+        history,
+    )
+
+def start_signup(username, password):
+    username = (username or "").strip()
+    users = load_users()
+
+    if not username or not password:
+        return (
+            gr.update(visible=True),
+            gr.update(visible=False),
+            "",
+            "",
+            "Please enter both a username and password.",
+        )
+
+    if username in users:
+        return (
+            gr.update(visible=True),
+            gr.update(visible=False),
+            "",
+            "",
+            "That username is already taken. Please log in instead.",
+        )
+
+    return (
+        gr.update(visible=False),
+        gr.update(visible=True),
+        username,
+        password,
+        "",
+    )
+
+def complete_signup(username_state, password_state, name, goal, height, weight, age, gender):
+    users = load_users()
+
+    profile = {
+        "name": name.strip() if name else username_state,
+        "goal": goal,
+        "height": height,
+        "weight": weight,
+        "age": age,
+        "gender": gender,
+    }
+
+    users[username_state] = {
+        "password_hash": hash_password(password_state),
+        "profile": profile,
+    }
+    save_users(users)
+
+    greeting = (
+        f"Thanks, {profile['name']}! Your account is set up and I'll remember "
+        f"your info next time you log in. Your goal is **{goal}** — ask me "
+        f"anything!"
+    )
+    history = [{"role": "assistant", "content": greeting}]
+
+    return (
+        gr.update(visible=False),  # signup_group
+        gr.update(visible=True),   # chat_group
+        profile,                   # profile_state
+        history,                   # chatbot_ui
+    )
+
+# -------------------------------------------------------------------
+# 6. Chat response function
+# -------------------------------------------------------------------
 def respond(message, history, profile):
     goal_name = profile.get("goal", "Maintaining Weight")
     context = retrieve_context(message, goal_name)
@@ -90,7 +215,7 @@ def respond(message, history, profile):
     )
 
     messages = [{"role": "system", "content": system_prompt}]
-    messages.extend(history_to_messages(history))
+    messages.extend(history)
     messages.append({"role": "user", "content": message})
 
     response = client.chat_completion(
@@ -103,88 +228,33 @@ def respond(message, history, profile):
 def user_send(message, history, profile):
     if not message.strip():
         return history, ""
-    reply = respond(message, history, profile)
-    history = history + [[message, reply]]
+    history = history + [{"role": "user", "content": message}]
+    reply = respond(message, history[:-1], profile)
+    history = history + [{"role": "assistant", "content": reply}]
     return history, ""
 
-
-def handle_login(profile: gr.OAuthProfile | None):
-    if profile is None:
-        # Not logged in yet
-        return (
-            gr.update(visible=False),  # intake_group
-            gr.update(visible=False),  # chat_group
-            "Please sign in above to get started.",
-            {},                        # profile_state
-            "",                        # username_state
-            [],                        # chatbot_ui
-        )
-
-    username = profile.username
-    profiles = load_profiles()
-
-    if username in profiles:
-        saved_profile = profiles[username]
-        greeting = (
-            f"Welcome back, {saved_profile['name']}! I remember your goal "
-            f"is **{saved_profile['goal']}**. Ask me anything!"
-        )
-        return (
-            gr.update(visible=False),
-            gr.update(visible=True),
-            "",
-            saved_profile,
-            username,
-            [[None, greeting]],
-        )
-    else:
-        return (
-            gr.update(visible=True),
-            gr.update(visible=False),
-            f"Hi {username}! Please tell us a bit about yourself to get started.",
-            {},
-            username,
-            [],
-        )
-
-def save_new_profile(username_state, name, goal, height, weight, age, gender):
-    profile = {
-        "name": name.strip() if name else username_state,
-        "goal": goal,
-        "height": height,
-        "weight": weight,
-        "age": age,
-        "gender": gender,
-    }
-
-    profiles = load_profiles()
-    profiles[username_state] = profile
-    save_profiles(profiles)
-
-    greeting = (
-        f"Thanks, {profile['name']}! I've saved your info and I'll remember "
-        f"it next time you sign in. Your goal is **{goal}** — ask me anything!"
-    )
-    history = [[None, greeting]]
-
-    return (
-        gr.update(visible=False),  # intake_group
-        gr.update(visible=True),   # chat_group
-        profile,                   # profile_state
-        history,                   # chatbot_ui
-    )
-
-
+# -------------------------------------------------------------------
+# 7. Gradio interface
+# -------------------------------------------------------------------
 with gr.Blocks(title="Nutrition & Fitness Chatbot") as demo:
     profile_state = gr.State({})
     username_state = gr.State("")
+    password_state = gr.State("")
 
     gr.Markdown("# 🥗 Nutrition & Fitness Chatbot")
-    gr.LoginButton()
-    login_status = gr.Markdown("")
 
-   
-    with gr.Group(visible=False) as intake_group:
+    # --- Screen 1: login / signup ---
+    with gr.Group(visible=True) as auth_group:
+        gr.Markdown("### Log in or create an account")
+        username_input = gr.Textbox(label="Username")
+        password_input = gr.Textbox(label="Password", type="password")
+        with gr.Row():
+            login_btn = gr.Button("Login", variant="primary")
+            signup_btn = gr.Button("Sign Up")
+        auth_status = gr.Markdown("")
+
+    # --- Screen 2: new account profile form ---
+    with gr.Group(visible=False) as signup_group:
         gr.Markdown("### Tell us a bit about yourself")
         name_input = gr.Textbox(label="Name")
         goal_input = gr.Dropdown(
@@ -198,24 +268,31 @@ with gr.Blocks(title="Nutrition & Fitness Chatbot") as demo:
             choices=["Female", "Male", "Non-binary", "Prefer not to say"],
             label="Gender",
         )
-        intake_submit = gr.Button("Save & Start Chatting", variant="primary")
+        signup_submit = gr.Button("Create Account & Start Chatting", variant="primary")
 
-
+    # --- Screen 3: chat ---
     with gr.Group(visible=False) as chat_group:
         chatbot_ui = gr.Chatbot(label="Chat")
         msg_input = gr.Textbox(label="Your message", placeholder="Ask me something...")
         send_btn = gr.Button("Send")
-        
-    demo.load(
-        handle_login,
-        inputs=None,
-        outputs=[intake_group, chat_group, login_status, profile_state, username_state, chatbot_ui],
+
+    # --- Wiring ---
+    login_btn.click(
+        check_login,
+        inputs=[username_input, password_input],
+        outputs=[auth_group, signup_group, chat_group, profile_state, auth_status, chatbot_ui],
     )
 
-    intake_submit.click(
-        save_new_profile,
-        inputs=[username_state, name_input, goal_input, height_input, weight_input, age_input, gender_input],
-        outputs=[intake_group, chat_group, profile_state, chatbot_ui],
+    signup_btn.click(
+        start_signup,
+        inputs=[username_input, password_input],
+        outputs=[auth_group, signup_group, username_state, password_state, auth_status],
+    )
+
+    signup_submit.click(
+        complete_signup,
+        inputs=[username_state, password_state, name_input, goal_input, height_input, weight_input, age_input, gender_input],
+        outputs=[signup_group, chat_group, profile_state, chatbot_ui],
     )
 
     send_btn.click(

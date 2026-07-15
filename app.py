@@ -23,6 +23,20 @@ KB_FILES = {
     "Losing Weight": "knowledgeLose.txt",
 }
 
+# Dietary preferences
+DIETARY_PREFERENCES = [
+    "Vegan",
+    "Vegetarian",
+    "Pescatarian",
+    "Keto",
+    "Paleo",
+    "Gluten-Free",
+    "Dairy-Free",
+    "Low-FODMAP",
+    "Mediterranean",
+    "Kosher",
+]
+
 def load_and_chunk(filepath):
     with open(filepath, "r", encoding="utf-8") as f:
         text = f.read()
@@ -164,8 +178,13 @@ def start_signup(username, password):
         "",
     )
 
-def complete_signup(username_state, password_state, name, goal, height, weight, age, gender):
+def complete_signup(username_state, password_state, name, goal, height, weight, age, gender, dietary_prefs, other_prefs):
     users = load_users()
+    
+    # Combine selected preferences with custom "other" preferences
+    combined_prefs = list(dietary_prefs) if dietary_prefs else []
+    if other_prefs and other_prefs.strip():
+        combined_prefs.append(f"Other: {other_prefs.strip()}")
 
     profile = {
         "name": name.strip() if name else username_state,
@@ -174,6 +193,7 @@ def complete_signup(username_state, password_state, name, goal, height, weight, 
         "weight": weight,
         "age": age,
         "gender": gender,
+        "dietary_preferences": combined_prefs,
     }
 
     users[username_state] = {
@@ -182,10 +202,11 @@ def complete_signup(username_state, password_state, name, goal, height, weight, 
     }
     save_users(users)
 
+    prefs_str = ", ".join(combined_prefs) if combined_prefs else "No specific preferences"
     greeting = (
         f"Thanks, {profile['name']}! Your account is set up and I'll remember "
-        f"your info next time you log in. Your goal is **{goal}** — ask me "
-        f"anything!"
+        f"your info next time you log in. Your goal is **{goal}** and your dietary preferences "
+        f"are: **{prefs_str}** — ask me anything!"
     )
     history = [{"role": "assistant", "content": greeting}]
 
@@ -201,6 +222,9 @@ def complete_signup(username_state, password_state, name, goal, height, weight, 
 # -------------------------------------------------------------------
 def respond(message, history, profile):
     goal_name = profile.get("goal", "Maintaining Weight")
+    dietary_prefs = profile.get("dietary_preferences", [])
+    prefs_str = ", ".join(dietary_prefs) if dietary_prefs else "No specific dietary preferences"
+    
     context = retrieve_context(message, goal_name)
 
     system_prompt = (
@@ -210,7 +234,8 @@ def respond(message, history, profile):
         "honestly rather than making something up.\n\n"
         f"User profile — name: {profile.get('name')}, age: {profile.get('age')}, "
         f"height: {profile.get('height')}, weight: {profile.get('weight')}, "
-        f"gender: {profile.get('gender')}, goal: {goal_name}\n\n"
+        f"gender: {profile.get('gender')}, goal: {goal_name}, "
+        f"dietary preferences: {prefs_str}\n\n"
         f"Reference information:\n{context}"
     )
 
@@ -268,6 +293,19 @@ with gr.Blocks(title="Nutrition & Fitness Chatbot") as demo:
             choices=["Female", "Male", "Non-binary", "Prefer not to say"],
             label="Gender",
         )
+        
+        # New dietary preferences section
+        gr.Markdown("### Dietary Preferences (select all that apply)")
+        dietary_input = gr.CheckboxGroup(
+            choices=DIETARY_PREFERENCES,
+            label="Which dietary preferences apply to you?",
+        )
+        other_dietary_input = gr.Textbox(
+            label="Other (please specify if not listed above)",
+            placeholder="e.g. Nut allergy, Halal, Etc.",
+            interactive=True,
+        )
+        
         signup_submit = gr.Button("Create Account & Start Chatting", variant="primary")
 
     # --- Screen 3: chat ---
@@ -291,7 +329,7 @@ with gr.Blocks(title="Nutrition & Fitness Chatbot") as demo:
 
     signup_submit.click(
         complete_signup,
-        inputs=[username_state, password_state, name_input, goal_input, height_input, weight_input, age_input, gender_input],
+        inputs=[username_state, password_state, name_input, goal_input, height_input, weight_input, age_input, gender_input, dietary_input, other_dietary_input],
         outputs=[signup_group, chat_group, profile_state, chatbot_ui],
     )
 

@@ -52,7 +52,9 @@ for goal_name, filepath in KB_FILES.items():
         "embeddings": embeddings,
     }
 
-
+# -------------------------------------------------------------------
+# 3. Retrieval function
+# -------------------------------------------------------------------
 def retrieve_context(query, goal_name, top_k=3):
     kb = knowledge_bases[goal_name]
     chunks = kb["chunks"]
@@ -70,6 +72,15 @@ def retrieve_context(query, goal_name, top_k=3):
     relevant_chunks = [chunks[i] for i in top_indices]
     return "\n\n".join(relevant_chunks)
 
+# -------------------------------------------------------------------
+# 4. Self-contained user accounts (no Hugging Face login required)
+#    Passwords are hashed before storage — a reasonable baseline for
+#    a class project, though not the same as production-grade auth.
+#
+#    NOTE: On the free tier of Hugging Face Spaces, local files are
+#    wiped when the Space restarts/sleeps unless you enable
+#    "Persistent Storage" in your Space settings.
+# -------------------------------------------------------------------
 USERS_FILE = "users.json"
 
 def load_users():
@@ -250,7 +261,240 @@ def user_send(message, history, profile):
 # -------------------------------------------------------------------
 # 7. Gradio interface
 # -------------------------------------------------------------------
-with gr.Blocks(title="HealthHub") as demo:
+custom_css = """
+/* Overall background */
+body {
+    background: linear-gradient(135deg, #1B5E5F 0%, #2A7F80 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+}
+
+/* Main container */
+.gradio-container {
+    background: transparent !important;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header styling */
+.gradio-container > h1 {
+    text-align: center;
+    color: white;
+    font-size: 48px;
+    font-weight: 700;
+    margin: 30px 0 40px 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Main groups - cream background */
+.gradio-group {
+    background: #E8EAE6 !important;
+    border-radius: 20px !important;
+    padding: 40px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    border: none !important;
+}
+
+/* Textbox inputs */
+.gradio-textbox input,
+.gradio-textbox textarea {
+    background: #2D2D2D !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 14px 16px !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+}
+
+.gradio-textbox input::placeholder,
+.gradio-textbox textarea::placeholder {
+    color: #888888 !important;
+}
+
+.gradio-textbox input:focus,
+.gradio-textbox textarea:focus {
+    border: 2px solid #1B5E5F !important;
+    box-shadow: 0 0 0 3px rgba(27, 94, 95, 0.1) !important;
+}
+
+/* Number inputs */
+.gradio-number input {
+    background: #2D2D2D !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 14px 16px !important;
+}
+
+.gradio-number input:focus {
+    border: 2px solid #1B5E5F !important;
+}
+
+/* Dropdown styling */
+.gradio-dropdown select,
+.gradio-dropdown button {
+    background: #2D2D2D !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 14px 16px !important;
+    font-size: 16px !important;
+}
+
+.gradio-dropdown select option {
+    background: #2D2D2D !important;
+    color: white !important;
+}
+
+/* Checkbox group styling */
+.gradio-checkboxgroup label {
+    background: white !important;
+    border-radius: 8px !important;
+    padding: 10px 14px !important;
+    margin: 8px 0 !important;
+    border: 2px solid #D4D4D0 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease;
+}
+
+.gradio-checkboxgroup label:hover {
+    border-color: #1B5E5F !important;
+    background: #F5F5F5 !important;
+}
+
+.gradio-checkboxgroup input[type="checkbox"]:checked + label {
+    background: #1B5E5F !important;
+    color: white !important;
+    border-color: #1B5E5F !important;
+}
+
+/* Primary button styling */
+.gradio-button.primary {
+    background: #1B5E5F !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 14px 32px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(27, 94, 95, 0.3);
+}
+
+.gradio-button.primary:hover {
+    background: #145455 !important;
+    box-shadow: 0 6px 16px rgba(27, 94, 95, 0.4);
+    transform: translateY(-2px);
+}
+
+.gradio-button.primary:active {
+    transform: translateY(0);
+}
+
+/* Secondary button styling */
+.gradio-button {
+    background: white !important;
+    color: #1B5E5F !important;
+    border: 2px solid #1B5E5F !important;
+    border-radius: 12px !important;
+    padding: 12px 28px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease;
+}
+
+.gradio-button:hover {
+    background: #1B5E5F !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(27, 94, 95, 0.2);
+}
+
+/* Chat interface styling */
+.gradio-chatbot {
+    background: white !important;
+    border-radius: 16px !important;
+    border: none !important;
+    padding: 20px !important;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* User message bubbles - teal */
+.gradio-chatbot .message.user {
+    background: #5DADE2 !important;
+    border-radius: 14px !important;
+    padding: 12px 16px !important;
+    color: white !important;
+    margin: 8px 0 !important;
+}
+
+/* Assistant message bubbles - lighter teal */
+.gradio-chatbot .message.assistant {
+    background: #A8D8E8 !important;
+    border-radius: 14px !important;
+    padding: 12px 16px !important;
+    color: #2D2D2D !important;
+    margin: 8px 0 !important;
+}
+
+/* Markdown styling */
+.gradio-markdown {
+    color: #2D2D2D !important;
+    font-size: 16px !important;
+}
+
+.gradio-markdown h3 {
+    color: #1B5E5F !important;
+    margin-top: 20px !important;
+    margin-bottom: 15px !important;
+    font-size: 20px !important;
+}
+
+.gradio-markdown h4 {
+    color: #1B5E5F !important;
+    margin-top: 15px !important;
+}
+
+/* Label styling */
+.gradio-label {
+    color: #2D2D2D !important;
+    font-weight: 600 !important;
+    margin-bottom: 8px !important;
+}
+
+/* Row styling */
+.gradio-row {
+    gap: 16px !important;
+}
+
+/* Info/Status message */
+.gradio-markdown p {
+    margin: 8px 0 !important;
+    line-height: 1.5 !important;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .gradio-container {
+        padding: 10px;
+    }
+    
+    .gradio-group {
+        padding: 20px !important;
+        border-radius: 16px !important;
+    }
+    
+    .gradio-container > h1 {
+        font-size: 36px;
+        margin: 20px 0 30px 0;
+    }
+}
+"""
+
+with gr.Blocks(title="HealthHub", css=custom_css) as demo:
     profile_state = gr.State({})
     username_state = gr.State("")
     password_state = gr.State("")

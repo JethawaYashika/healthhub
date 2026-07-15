@@ -148,38 +148,44 @@ def check_login(username, password):
         history,
     )
 
-def start_signup(username, password):
-    username = (username or "").strip()
-    users = load_users()
-
-    if not username or not password:
-        return (
-            gr.update(visible=True),
-            gr.update(visible=False),
-            "",
-            "",
-            "Please enter both a username and password.",
-        )
-
-    if username in users:
-        return (
-            gr.update(visible=True),
-            gr.update(visible=False),
-            "",
-            "",
-            "That username is already taken. Please log in instead.",
-        )
-
+def start_signup():
     return (
         gr.update(visible=False),
         gr.update(visible=True),
-        username,
-        password,
         "",
     )
 
-def complete_signup(username_state, password_state, name, goal, height, weight, age, gender, dietary_prefs, other_prefs):
+def complete_signup(username, password, password_confirm, name, goal, height, weight, age, gender, dietary_prefs, other_prefs):
     users = load_users()
+    
+    username = (username or "").strip()
+    
+    if not username or not password or not password_confirm:
+        return (
+            gr.update(visible=False),
+            gr.update(visible=False),
+            "Please fill in all fields including password.",
+            {},
+            [],
+        )
+    
+    if password != password_confirm:
+        return (
+            gr.update(visible=False),
+            gr.update(visible=False),
+            "Passwords do not match. Please try again.",
+            {},
+            [],
+        )
+    
+    if username in users:
+        return (
+            gr.update(visible=False),
+            gr.update(visible=False),
+            "That username is already taken. Please try a different one.",
+            {},
+            [],
+        )
     
     # Combine selected preferences with custom "other" preferences
     combined_prefs = list(dietary_prefs) if dietary_prefs else []
@@ -187,7 +193,7 @@ def complete_signup(username_state, password_state, name, goal, height, weight, 
         combined_prefs.append(f"Other: {other_prefs.strip()}")
 
     profile = {
-        "name": name.strip() if name else username_state,
+        "name": name.strip() if name else username,
         "goal": goal,
         "height": height,
         "weight": weight,
@@ -196,8 +202,8 @@ def complete_signup(username_state, password_state, name, goal, height, weight, 
         "dietary_preferences": combined_prefs,
     }
 
-    users[username_state] = {
-        "password_hash": hash_password(password_state),
+    users[username] = {
+        "password_hash": hash_password(password),
         "profile": profile,
     }
     save_users(users)
@@ -213,6 +219,7 @@ def complete_signup(username_state, password_state, name, goal, height, weight, 
     return (
         gr.update(visible=False),  # signup_group
         gr.update(visible=True),   # chat_group
+        "",                        # signup_status
         profile,                   # profile_state
         history,                   # chatbot_ui
     )
@@ -432,23 +439,37 @@ button[variant="secondary"]:hover {
     min-height: 400px !important;
 }
 
+.gradio-chatbot > div {
+    background: #F5F5F3 !important;
+}
+
+.gradio-chatbot .message-wrap {
+    background: transparent !important;
+}
+
 .gradio-chatbot .message {
     border-radius: 10px !important;
     padding: 14px 16px !important;
     font-size: 15px !important;
     margin: 10px 0 !important;
+    max-width: 85%;
+    line-height: 1.5 !important;
 }
 
 .gradio-chatbot .message.user {
     background: #7FB3D5 !important;
     color: white !important;
-    margin-left: 60px !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    text-align: left !important;
 }
 
 .gradio-chatbot .message.assistant {
     background: #B8DFE8 !important;
     color: #2D2D2D !important;
-    margin-right: 60px !important;
+    margin-right: auto !important;
+    margin-left: 0 !important;
+    text-align: left !important;
 }
 
 /* Labels */
@@ -457,6 +478,11 @@ label {
     font-weight: 600 !important;
     font-size: 14px !important;
     margin-bottom: 8px !important;
+}
+
+/* Hide the Chat label for chatbot */
+.gradio-chatbot ~ label {
+    display: none !important;
 }
 
 /* Row container */
@@ -489,8 +515,6 @@ label {
 
 with gr.Blocks(title="HealthHub", css=custom_css) as demo:
     profile_state = gr.State({})
-    username_state = gr.State("")
-    password_state = gr.State("")
 
     gr.Markdown("# 🥗 HealthHub")
 
@@ -506,6 +530,13 @@ with gr.Blocks(title="HealthHub", css=custom_css) as demo:
 
     # --- Screen 2: new account profile form ---
     with gr.Group(visible=False) as signup_group:
+        gr.Markdown("### Create Your Account")
+        
+        # Account credentials
+        signup_username_input = gr.Textbox(label="Username")
+        signup_password_input = gr.Textbox(label="Password", type="password")
+        signup_password_confirm = gr.Textbox(label="Confirm Password", type="password")
+        
         gr.Markdown("### Tell us a bit about yourself")
         name_input = gr.Textbox(label="Name")
         goal_input = gr.Dropdown(
@@ -532,6 +563,7 @@ with gr.Blocks(title="HealthHub", css=custom_css) as demo:
             interactive=True,
         )
         
+        signup_status = gr.Markdown("")
         signup_submit = gr.Button("Create Account & Start Chatting", variant="primary")
 
     # --- Screen 3: chat ---
@@ -549,14 +581,17 @@ with gr.Blocks(title="HealthHub", css=custom_css) as demo:
 
     signup_btn.click(
         start_signup,
-        inputs=[username_input, password_input],
-        outputs=[auth_group, signup_group, username_state, password_state, auth_status],
+        inputs=[],
+        outputs=[auth_group, signup_group],
+    ).then(
+        lambda: ("", ""),
+        outputs=[username_input, password_input]
     )
 
     signup_submit.click(
         complete_signup,
-        inputs=[username_state, password_state, name_input, goal_input, height_input, weight_input, age_input, gender_input, dietary_input, other_dietary_input],
-        outputs=[signup_group, chat_group, profile_state, chatbot_ui],
+        inputs=[signup_username_input, signup_password_input, signup_password_confirm, name_input, goal_input, height_input, weight_input, age_input, gender_input, dietary_input, other_dietary_input],
+        outputs=[signup_group, chat_group, signup_status, profile_state, chatbot_ui],
     )
 
     send_btn.click(

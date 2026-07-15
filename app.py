@@ -262,224 +262,218 @@ def user_send(message, history, profile):
 # 7. Gradio interface
 # -------------------------------------------------------------------
 custom_css = """
-/* Overall background */
-body {
-    background: linear-gradient(135deg, #1B5E5F 0%, #2A7F80 100%);
+* {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    min-height: 100vh;
 }
 
-/* Main container */
+body {
+    background: linear-gradient(135deg, #2A8A8C 0%, #1B5E5F 100%) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
 .gradio-container {
     background: transparent !important;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px;
+    max-width: 950px;
+    margin: 0 auto !important;
+    padding: 30px 20px !important;
 }
 
-/* Header styling */
+/* Header title */
 .gradio-container > h1 {
     text-align: center;
-    color: white;
-    font-size: 48px;
-    font-weight: 700;
-    margin: 30px 0 40px 0;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    color: white !important;
+    font-size: 42px !important;
+    font-weight: 600 !important;
+    margin: 0 0 30px 0 !important;
+    letter-spacing: 0.5px;
 }
 
-/* Main groups - cream background */
+/* All groups get cream background */
 .gradio-group {
-    background: #E8EAE6 !important;
-    border-radius: 20px !important;
-    padding: 40px !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    background: #D8DDD8 !important;
+    border-radius: 24px !important;
+    padding: 35px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
     border: none !important;
+    margin-bottom: 20px !important;
 }
 
-/* Textbox inputs */
-.gradio-textbox input,
-.gradio-textbox textarea {
-    background: #2D2D2D !important;
+/* Markdown headings */
+.gradio-markdown h3 {
+    color: #1B5E5F !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    margin: 0 0 20px 0 !important;
+}
+
+.gradio-markdown p {
+    color: #2D2D2D !important;
+    font-size: 15px !important;
+    margin: 10px 0 !important;
+}
+
+/* Text inputs */
+input[type="text"],
+input[type="password"],
+textarea {
+    background: #1A1A1A !important;
     color: white !important;
     border: none !important;
-    border-radius: 12px !important;
-    padding: 14px 16px !important;
-    font-size: 16px !important;
-    font-weight: 500 !important;
+    border-radius: 10px !important;
+    padding: 12px 16px !important;
+    font-size: 15px !important;
 }
 
-.gradio-textbox input::placeholder,
-.gradio-textbox textarea::placeholder {
-    color: #888888 !important;
+input::placeholder,
+textarea::placeholder {
+    color: #666666 !important;
 }
 
-.gradio-textbox input:focus,
-.gradio-textbox textarea:focus {
-    border: 2px solid #1B5E5F !important;
-    box-shadow: 0 0 0 3px rgba(27, 94, 95, 0.1) !important;
+input:focus,
+textarea:focus {
+    outline: none !important;
+    border: 2px solid #2A8A8C !important;
+    box-shadow: 0 0 8px rgba(42, 138, 140, 0.3) !important;
 }
 
 /* Number inputs */
-.gradio-number input {
-    background: #2D2D2D !important;
+input[type="number"] {
+    background: #1A1A1A !important;
     color: white !important;
     border: none !important;
-    border-radius: 12px !important;
-    padding: 14px 16px !important;
+    border-radius: 10px !important;
+    padding: 12px 16px !important;
+    font-size: 15px !important;
 }
 
-.gradio-number input:focus {
-    border: 2px solid #1B5E5F !important;
-}
-
-/* Dropdown styling */
-.gradio-dropdown select,
-.gradio-dropdown button {
-    background: #2D2D2D !important;
+/* Dropdowns */
+select {
+    background: #1A1A1A !important;
     color: white !important;
     border: none !important;
-    border-radius: 12px !important;
-    padding: 14px 16px !important;
-    font-size: 16px !important;
+    border-radius: 10px !important;
+    padding: 12px 16px !important;
+    font-size: 15px !important;
 }
 
-.gradio-dropdown select option {
-    background: #2D2D2D !important;
+select option {
+    background: #1A1A1A !important;
     color: white !important;
 }
 
-/* Checkbox group styling */
+/* Checkbox styling */
+.gradio-checkboxgroup {
+    display: flex;
+    flex-direction: column;
+    gap: 10px !important;
+}
+
 .gradio-checkboxgroup label {
     background: white !important;
+    color: #2D2D2D !important;
+    border: 2px solid #C0C0BA !important;
     border-radius: 8px !important;
-    padding: 10px 14px !important;
-    margin: 8px 0 !important;
-    border: 2px solid #D4D4D0 !important;
+    padding: 12px 14px !important;
     cursor: pointer !important;
-    transition: all 0.2s ease;
+    transition: all 0.2s ease !important;
+    font-weight: 500 !important;
 }
 
 .gradio-checkboxgroup label:hover {
-    border-color: #1B5E5F !important;
-    background: #F5F5F5 !important;
+    border-color: #2A8A8C !important;
+    background: #F8F8F8 !important;
 }
 
 .gradio-checkboxgroup input[type="checkbox"]:checked + label {
-    background: #1B5E5F !important;
+    background: #2A8A8C !important;
     color: white !important;
-    border-color: #1B5E5F !important;
+    border-color: #2A8A8C !important;
 }
 
-/* Primary button styling */
-.gradio-button.primary {
-    background: #1B5E5F !important;
+/* Primary buttons */
+.gradio-button {
+    background: #2A8A8C !important;
     color: white !important;
     border: none !important;
-    border-radius: 12px !important;
-    padding: 14px 32px !important;
+    border-radius: 10px !important;
+    padding: 12px 24px !important;
     font-size: 16px !important;
     font-weight: 600 !important;
     cursor: pointer !important;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(27, 94, 95, 0.3);
-}
-
-.gradio-button.primary:hover {
-    background: #145455 !important;
-    box-shadow: 0 6px 16px rgba(27, 94, 95, 0.4);
-    transform: translateY(-2px);
-}
-
-.gradio-button.primary:active {
-    transform: translateY(0);
-}
-
-/* Secondary button styling */
-.gradio-button {
-    background: white !important;
-    color: #1B5E5F !important;
-    border: 2px solid #1B5E5F !important;
-    border-radius: 12px !important;
-    padding: 12px 28px !important;
-    font-size: 16px !important;
-    font-weight: 600 !important;
-    cursor: pointer !important;
-    transition: all 0.3s ease;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 12px rgba(42, 138, 140, 0.3) !important;
 }
 
 .gradio-button:hover {
     background: #1B5E5F !important;
-    color: white !important;
-    box-shadow: 0 4px 12px rgba(27, 94, 95, 0.2);
+    box-shadow: 0 6px 16px rgba(27, 94, 95, 0.4) !important;
+    transform: translateY(-1px) !important;
 }
 
-/* Chat interface styling */
-.gradio-chatbot {
+/* Secondary buttons */
+button[variant="secondary"] {
     background: white !important;
-    border-radius: 16px !important;
+    color: #2A8A8C !important;
+    border: 2px solid #2A8A8C !important;
+}
+
+button[variant="secondary"]:hover {
+    background: #2A8A8C !important;
+    color: white !important;
+}
+
+/* Chat styling - most important */
+.gradio-chatbot {
+    background: #F5F5F3 !important;
+    border-radius: 14px !important;
     border: none !important;
     padding: 20px !important;
-    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+    min-height: 400px !important;
 }
 
-/* User message bubbles - teal */
+.gradio-chatbot .message {
+    border-radius: 10px !important;
+    padding: 14px 16px !important;
+    font-size: 15px !important;
+    margin: 10px 0 !important;
+}
+
 .gradio-chatbot .message.user {
-    background: #5DADE2 !important;
-    border-radius: 14px !important;
-    padding: 12px 16px !important;
+    background: #7FB3D5 !important;
     color: white !important;
-    margin: 8px 0 !important;
+    margin-left: 60px !important;
 }
 
-/* Assistant message bubbles - lighter teal */
 .gradio-chatbot .message.assistant {
-    background: #A8D8E8 !important;
-    border-radius: 14px !important;
-    padding: 12px 16px !important;
+    background: #B8DFE8 !important;
     color: #2D2D2D !important;
-    margin: 8px 0 !important;
+    margin-right: 60px !important;
 }
 
-/* Markdown styling */
-.gradio-markdown {
-    color: #2D2D2D !important;
-    font-size: 16px !important;
-}
-
-.gradio-markdown h3 {
-    color: #1B5E5F !important;
-    margin-top: 20px !important;
-    margin-bottom: 15px !important;
-    font-size: 20px !important;
-}
-
-.gradio-markdown h4 {
-    color: #1B5E5F !important;
-    margin-top: 15px !important;
-}
-
-/* Label styling */
-.gradio-label {
+/* Labels */
+label {
     color: #2D2D2D !important;
     font-weight: 600 !important;
+    font-size: 14px !important;
     margin-bottom: 8px !important;
 }
 
-/* Row styling */
+/* Row container */
 .gradio-row {
     gap: 16px !important;
 }
 
-/* Info/Status message */
-.gradio-markdown p {
-    margin: 8px 0 !important;
-    line-height: 1.5 !important;
+/* Status message */
+.gradio-textbox,
+.gradio-number,
+.gradio-dropdown {
+    margin-bottom: 16px !important;
 }
 
-/* Responsive */
 @media (max-width: 600px) {
     .gradio-container {
-        padding: 10px;
+        padding: 15px 10px !important;
     }
     
     .gradio-group {
@@ -488,8 +482,7 @@ body {
     }
     
     .gradio-container > h1 {
-        font-size: 36px;
-        margin: 20px 0 30px 0;
+        font-size: 32px !important;
     }
 }
 """

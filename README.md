@@ -1,4 +1,5 @@
 ---
+hf_oauth: true
 title: 2.3 - Group A5 - Capstone Project
 emoji: 🚀
 colorFrom: gray

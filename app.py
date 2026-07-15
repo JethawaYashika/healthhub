@@ -9,21 +9,14 @@ import torch
 hf_token = os.environ.get("HF_TOKEN")
 client = InferenceClient("Qwen/Qwen2.5-7B-Instruct", token=hf_token)
 
-# -------------------------------------------------------------------
-# 1. Load the embedding model (used to turn text into vectors)
-# -------------------------------------------------------------------
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
-# -------------------------------------------------------------------
-# 2. Load and chunk each knowledge base file
-# -------------------------------------------------------------------
 KB_FILES = {
     "Gaining Weight": "knowledgeGain.txt",
     "Maintaining Weight": "knowledgeMaintain.txt",
     "Losing Weight": "knowledgeLose.txt",
 }
 
-# Dietary preferences
 DIETARY_PREFERENCES = [
     "Vegan",
     "Vegetarian",
@@ -52,9 +45,7 @@ for goal_name, filepath in KB_FILES.items():
         "embeddings": embeddings,
     }
 
-# -------------------------------------------------------------------
-# 3. Retrieval function
-# -------------------------------------------------------------------
+
 def retrieve_context(query, goal_name, top_k=3):
     kb = knowledge_bases[goal_name]
     chunks = kb["chunks"]
@@ -72,15 +63,7 @@ def retrieve_context(query, goal_name, top_k=3):
     relevant_chunks = [chunks[i] for i in top_indices]
     return "\n\n".join(relevant_chunks)
 
-# -------------------------------------------------------------------
-# 4. Self-contained user accounts (no Hugging Face login required)
-#    Passwords are hashed before storage — a reasonable baseline for
-#    a class project, though not the same as production-grade auth.
-#
-#    NOTE: On the free tier of Hugging Face Spaces, local files are
-#    wiped when the Space restarts/sleeps unless you enable
-#    "Persistent Storage" in your Space settings.
-# -------------------------------------------------------------------
+
 USERS_FILE = "users.json"
 
 def load_users():
@@ -96,21 +79,19 @@ def save_users(users):
 def hash_password(password):
     return hashlib.sha256(password.encode("utf-8")).hexdigest()
 
-# -------------------------------------------------------------------
-# 5. Login / signup logic
-# -------------------------------------------------------------------
+
 def check_login(username, password):
     username = (username or "").strip()
     users = load_users()
 
     if not username or not password:
         return (
-            gr.update(visible=True),   # auth_group
-            gr.update(visible=False),  # signup_group
-            gr.update(visible=False),  # chat_group
-            {},                        # profile_state
+            gr.update(visible=True),   
+            gr.update(visible=False),  
+            gr.update(visible=False),  
+            {},                        
             "Please enter both a username and password.",
-            [],                        # chatbot_ui
+            [],                        
         )
 
     if username not in users:
@@ -187,7 +168,6 @@ def complete_signup(username, password, password_confirm, name, goal, height, we
             [],
         )
     
-    # Combine selected preferences with custom "other" preferences
     combined_prefs = list(dietary_prefs) if dietary_prefs else []
     if other_prefs and other_prefs.strip():
         combined_prefs.append(f"Other: {other_prefs.strip()}")
@@ -217,16 +197,13 @@ def complete_signup(username, password, password_confirm, name, goal, height, we
     history = [{"role": "assistant", "content": greeting}]
 
     return (
-        gr.update(visible=False),  # signup_group
-        gr.update(visible=True),   # chat_group
-        "",                        # signup_status
-        profile,                   # profile_state
-        history,                   # chatbot_ui
+        gr.update(visible=False),  
+        gr.update(visible=True),   
+        "",                        
+        profile,                   
+        history,                   
     )
 
-# -------------------------------------------------------------------
-# 6. Chat response function
-# -------------------------------------------------------------------
 def respond(message, history, profile):
     goal_name = profile.get("goal", "Maintaining Weight")
     dietary_prefs = profile.get("dietary_preferences", [])
@@ -264,10 +241,7 @@ def user_send(message, history, profile):
     reply = respond(message, history[:-1], profile)
     history = history + [{"role": "assistant", "content": reply}]
     return history, ""
-
-# -------------------------------------------------------------------
-# 7. Gradio interface
-# -------------------------------------------------------------------
+    
 custom_css = """
 * {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -518,7 +492,6 @@ with gr.Blocks(title="HealthHub", css=custom_css) as demo:
 
     gr.Markdown("# 🥗 HealthHub")
 
-    # --- Screen 1: login / signup ---
     with gr.Group(visible=True) as auth_group:
         gr.Markdown("### Log in or create an account")
         username_input = gr.Textbox(label="Username")
@@ -528,11 +501,9 @@ with gr.Blocks(title="HealthHub", css=custom_css) as demo:
             signup_btn = gr.Button("Sign Up")
         auth_status = gr.Markdown("")
 
-    # --- Screen 2: new account profile form ---
     with gr.Group(visible=False) as signup_group:
         gr.Markdown("### Create Your Account")
         
-        # Account credentials
         signup_username_input = gr.Textbox(label="Username")
         signup_password_input = gr.Textbox(label="Password", type="password")
         signup_password_confirm = gr.Textbox(label="Confirm Password", type="password")
@@ -551,7 +522,6 @@ with gr.Blocks(title="HealthHub", css=custom_css) as demo:
             label="Gender",
         )
         
-        # New dietary preferences section
         gr.Markdown("### Dietary Preferences (select all that apply)")
         dietary_input = gr.CheckboxGroup(
             choices=DIETARY_PREFERENCES,
@@ -566,13 +536,11 @@ with gr.Blocks(title="HealthHub", css=custom_css) as demo:
         signup_status = gr.Markdown("")
         signup_submit = gr.Button("Create Account & Start Chatting", variant="primary")
 
-    # --- Screen 3: chat ---
     with gr.Group(visible=False) as chat_group:
         chatbot_ui = gr.Chatbot(label="Chat")
         msg_input = gr.Textbox(label="Your message", placeholder="Ask me something...")
         send_btn = gr.Button("Send")
 
-    # --- Wiring ---
     login_btn.click(
         check_login,
         inputs=[username_input, password_input],

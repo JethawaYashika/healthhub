@@ -52,9 +52,7 @@ for goal_name, filepath in KB_FILES.items():
         "embeddings": embeddings,
     }
 
-# -------------------------------------------------------------------
-# 3. Retrieval function
-# -------------------------------------------------------------------
+
 def retrieve_context(query, goal_name, top_k=3):
     kb = knowledge_bases[goal_name]
     chunks = kb["chunks"]
@@ -72,15 +70,6 @@ def retrieve_context(query, goal_name, top_k=3):
     relevant_chunks = [chunks[i] for i in top_indices]
     return "\n\n".join(relevant_chunks)
 
-# -------------------------------------------------------------------
-# 4. Self-contained user accounts (no Hugging Face login required)
-#    Passwords are hashed before storage — a reasonable baseline for
-#    a class project, though not the same as production-grade auth.
-#
-#    NOTE: On the free tier of Hugging Face Spaces, local files are
-#    wiped when the Space restarts/sleeps unless you enable
-#    "Persistent Storage" in your Space settings.
-# -------------------------------------------------------------------
 USERS_FILE = "users.json"
 
 def load_users():
@@ -220,7 +209,7 @@ def complete_signup(username_state, password_state, name, goal, height, weight, 
 # -------------------------------------------------------------------
 # 6. Chat response function
 # -------------------------------------------------------------------
-def respond(message, history, profile, max_response_length=1500):
+def respond(message, history, profile):
     goal_name = profile.get("goal", "Maintaining Weight")
     dietary_prefs = profile.get("dietary_preferences", [])
     prefs_str = ", ".join(dietary_prefs) if dietary_prefs else "No specific dietary preferences"
@@ -245,16 +234,16 @@ def respond(message, history, profile, max_response_length=1500):
 
     response = client.chat_completion(
         messages,
-        max_tokens=int(max_response_length),
+        max_tokens=1500,
         temperature=0.2,
     )
     return response.choices[0].message.content.strip()
 
-def user_send(message, history, profile, max_response_length):
+def user_send(message, history, profile):
     if not message.strip():
         return history, ""
     history = history + [{"role": "user", "content": message}]
-    reply = respond(message, history[:-1], profile, max_response_length)
+    reply = respond(message, history[:-1], profile)
     history = history + [{"role": "assistant", "content": reply}]
     return history, ""
 
@@ -266,7 +255,7 @@ with gr.Blocks(title="HealthHub") as demo:
     username_state = gr.State("")
     password_state = gr.State("")
 
-    gr.Markdown("# 🏥 HealthHub")
+    gr.Markdown("# 🥗 HealthHub")
 
     # --- Screen 1: login / signup ---
     with gr.Group(visible=True) as auth_group:
@@ -312,16 +301,7 @@ with gr.Blocks(title="HealthHub") as demo:
     with gr.Group(visible=False) as chat_group:
         chatbot_ui = gr.Chatbot(label="Chat")
         msg_input = gr.Textbox(label="Your message", placeholder="Ask me something...")
-        with gr.Row():
-            send_btn = gr.Button("Send", scale=1)
-            response_length = gr.Slider(
-                minimum=300,
-                maximum=2000,
-                value=1500,
-                step=100,
-                label="Response Length",
-                scale=2,
-            )
+        send_btn = gr.Button("Send")
 
     # --- Wiring ---
     login_btn.click(
@@ -344,12 +324,12 @@ with gr.Blocks(title="HealthHub") as demo:
 
     send_btn.click(
         user_send,
-        inputs=[msg_input, chatbot_ui, profile_state, response_length],
+        inputs=[msg_input, chatbot_ui, profile_state],
         outputs=[chatbot_ui, msg_input],
     )
     msg_input.submit(
         user_send,
-        inputs=[msg_input, chatbot_ui, profile_state, response_length],
+        inputs=[msg_input, chatbot_ui, profile_state],
         outputs=[chatbot_ui, msg_input],
     )
 

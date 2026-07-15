@@ -1,0 +1,76 @@
+======================================================================
+SECTION 1: STRUCTURED EXERCISE PLANS (WORKOUT SPLITS)
+======================================================================
+
+PLAN NAME: Full Body Split
+- Best Used For: Beginners, busy individuals, and overall fat loss.
+- Weekly Frequency: 3 days per week (e.g., Monday, Wednesday, Friday).
+- How It Works: Trains every major muscle group in a single session.
+- Primary Purpose: Maximizes workout frequency per muscle group and boosts weekly calorie burn.
+
+PLAN NAME: Push / Pull / Legs (PPL)
+- Best Used For: Intermediate to advanced lifters looking to build muscle size.
+- Weekly Frequency: 3 to 6 days per week.
+- How It Works: Splits workouts by movement patterns. 
+  * Push Day: Chest, shoulders, and triceps.
+  * Pull Day: Back, biceps, and rear delts.
+  * Legs Day: Quads, hamstrings, glutes, and calves.
+- Primary Purpose: Allows high training volume for specific muscles while giving them 48-72 hours of total rest.
+
+PLAN NAME: Upper / Lower Split
+- Best Used For: People wanting a balance of strength and muscle growth.
+- Weekly Frequency: 4 days per week (2 upper days, 2 lower days).
+- How It Works: Focuses entirely on the upper body one day, and entirely on the lower body the next.
+- Primary Purpose: Provides an ideal balance of high intensity and sufficient recovery.
+
+======================================================================
+SECTION 2: INDIVIDUAL EXERCISE MOVEMENT DIRECTORY
+======================================================================
+
+MOVEMENT: Barbell Back Squat
+- Category: Lower Body (Compound)
+- Target Muscles: Quadriceps, Glutes, Adductors, Core.
+- Primary Purpose: Building raw lower body strength, functional leg power, and leg muscle mass.
+
+MOVEMENT: Conventional Deadlift
+- Category: Posterior Chain (Compound)
+- Target Muscles: Hamstrings, Glutes, Spinal Erectors, Latissimus Dorsi, Traps.
+- Primary Purpose: Developing total-body pulling power, strengthening the lower back, and improving hip extension.
+
+MOVEMENT: Flat Barbell Bench Press
+- Category: Upper Body Push (Compound)
+- Target Muscles: Pectoralis Major (Chest), Anterior Deltoids (Front Shoulders), Triceps.
+- Primary Purpose: Increasing upper body pushing power and building chest mass.
+
+MOVEMENT: Pull-Up / Chin-Up
+- Category: Upper Body Pull (Compound)
+- Target Muscles: Latissimus Dorsi (Lats), Rhomboids, Biceps, Core.
+- Primary Purpose: Developing upper body pulling strength and creating a wider, "V-taper" back appearance.
+
+MOVEMENT: Overhead Barbell Press (Military Press)
+- Category: Upper Body Push (Compound)
+- Target Muscles: Deltoids (Shoulders), Triceps, Upper Chest, Core.
+- Primary Purpose: Building vertical pushing strength and stabilizing the shoulder girdle.
+
+MOVEMENT: Romanian Deadlift (RDL)
+- Category: Posterior Chain (Isolation/Focus)
+- Target Muscles: Hamstrings, Glutes.
+- Primary Purpose: Specifically targeting hip hinge mechanics to stretch and strengthen the back of the legs.
+
+MOVEMENT: Barbell Bicep Curl
+- Category: Upper Body Pull (Isolation)
+- Target Muscles: Biceps Brachii.
+- Primary Purpose: Isolating the front of the arm to directly trigger bicep muscle growth.
+
+MOVEMENT: Overhead Dumbbell Tricep Extension
+- Category: Upper Body Push (Isolation)
+- Target Muscles: Triceps Brachii (Long Head).
+- Primary Purpose: Isolating and fully stretching the triceps to build arm thickness.
+
+MOVEMENT: Hanging Leg Raise
+- Category: Core
+- Target Muscles: Rectus Abdominis (Abs), Hip Flexors.
+- Primary Purpose: Improving core stability, spinal control, and developing visible abdominal definition.
+
+======================================================================
+END OF DATASET

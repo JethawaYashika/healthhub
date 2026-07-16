@@ -400,7 +400,7 @@ button[variant=secondary]:hover {
 }
 /* Chat styling */
 .gradio-chatbot {
-    background: #F5F5F3 !important;
+    background: #E7FFFE5 !important;
     border-radius: 14px !important;
     border: none !important;
     padding: 20px !important;

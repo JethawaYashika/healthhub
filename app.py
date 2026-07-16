@@ -244,25 +244,21 @@ def user_send(message, history, profile):
     
 custom_css = """
 @import url('https://googleapis.com');
-
 * { 
     font-family: 'DM Serif Display', serif !important; 
 }
-
 body {
     background: #3F9E91;
     background: linear-gradient(135deg, rgba(63, 158, 145, 1) 23%, rgba(4, 194, 159, 1) 100%);
     margin: 0 !important;
     padding: 0 !important;
 }
-
 .gradio-container {
     background: transparent !important;
     max-width: 950px;
     margin: 0 auto !important;
     padding: 30px 20px !important;
 }
-
 /* Header title */
 .gradio-container > h1 {
     text-align: center;
@@ -272,18 +268,15 @@ body {
     margin: 0 0 30px 0 !important;
     letter-spacing: 0.5px;
 }
-
 /* All groups get cream background */
 .gradio-group {
     background-color: #D8DDD8 !important;
     border-color: #D8DDD8 !important;
 }
-
 .gradio-group .block, .dark .gradio-group, .dark .gradio-group .block {
     background-color: #D8DDD8 !important;
     border-color: #D8DDD8 !important;
 }
-
 /* Markdown headings */
 .gradio-markdown h3 {
     color: #1B5E5F !important;
@@ -291,13 +284,11 @@ body {
     font-weight: 600 !important;
     margin: 0 0 20px 0 !important;
 }
-
 .gradio-markdown p {
     color: #2D2D2D !important;
     font-size: 15px !important;
     margin: 10px 0 !important;
 }
-
 /* Text inputs */
 input[type=text], input[type=password], textarea {
     background: #1A1A1A !important;
@@ -307,17 +298,16 @@ input[type=text], input[type=password], textarea {
     padding: 12px 16px !important;
     font-size: 15px !important;
 }
-
-input::placeholder, textarea::placeholder {
-    color: #666666 !important;
+input::placeholder, textarea::placeholder, 
+input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+    color: #A0A0A0 !important;
+    opacity: 1 !important;
 }
-
 input:focus, textarea:focus {
     outline: none !important;
     border: 2px solid #2A8A8C !important;
     box-shadow: 0 0 8px rgba(42, 138, 140, 0.3) !important;
 }
-
 /* Number inputs */
 input[type=number] {
     background: #1A1A1A !important;
@@ -327,7 +317,6 @@ input[type=number] {
     padding: 12px 16px !important;
     font-size: 15px !important;
 }
-
 /* Dropdowns */
 select {
     background: #1A1A1A !important;
@@ -337,19 +326,16 @@ select {
     padding: 12px 16px !important;
     font-size: 15px !important;
 }
-
 select option {
     background: #1A1A1A !important;
     color: white !important;
 }
-
 /* Checkbox styling */
 .gradio-checkboxgroup {
     display: flex;
     flex-direction: column;
     gap: 10px !important;
 }
-
 .gradio-checkboxgroup label {
     background: white !important;
     color: #2D2D2D !important;
@@ -360,18 +346,15 @@ select option {
     transition: all 0.2s ease !important;
     font-weight: 500 !important;
 }
-
 .gradio-checkboxgroup label:hover {
     border-color: #2A8A8C !important;
     background: #F8F8F8 !important;
 }
-
 .gradio-checkboxgroup input[type=checkbox]:checked + label {
     background: #2A8A8C !important;
     color: white !important;
     border-color: #2A8A8C !important;
 }
-
 /* Primary buttons */
 .gradio-button {
     background: #2A8A8C !important;
@@ -385,25 +368,21 @@ select option {
     transition: all 0.3s ease !important;
     box-shadow: 0 4px 12px rgba(42, 138, 140, 0.3) !important;
 }
-
 .gradio-button:hover {
     background: #1B5E5F !important;
     box-shadow: 0 6px 16px rgba(27, 94, 95, 0.4) !important;
     transform: translateY(-1px) !important;
 }
-
 /* Secondary buttons */
 button[variant=secondary] {
     background: white !important;
     color: #2A8A8C !important;
     border: 2px solid #2A8A8C !important;
 }
-
 button[variant=secondary]:hover {
     background: #2A8A8C !important;
     color: white !important;
 }
-
 /* Chat styling */
 .gradio-chatbot {
     background: #F5F5F3 !important;
@@ -412,15 +391,12 @@ button[variant=secondary]:hover {
     padding: 20px !important;
     min-height: 400px !important;
 }
-
 .gradio-chatbot > div {
     background: #F5F5F3 !important;
 }
-
 .gradio-chatbot .message-wrap {
     background: transparent !important;
 }
-
 .gradio-chatbot .message {
     border-radius: 10px !important;
     padding: 14px 16px !important;
@@ -429,7 +405,6 @@ button[variant=secondary]:hover {
     max-width: 85%;
     line-height: 1.5 !important;
 }
-
 .gradio-chatbot .message.user {
     background: #7FB3D5 !important;
     color: white !important;
@@ -437,7 +412,6 @@ button[variant=secondary]:hover {
     margin-right: 0 !important;
     text-align: left !important;
 }
-
 .gradio-chatbot .message.assistant {
     background: #B8DFE8 !important;
     color: #2D2D2D !important;
@@ -445,7 +419,6 @@ button[variant=secondary]:hover {
     margin-left: 0 !important;
     text-align: left !important;
 }
-
 /* Labels */
 label {
     color: #2D2D2D !important;
@@ -453,22 +426,18 @@ label {
     font-size: 14px !important;
     margin-bottom: 8px !important;
 }
-
 /* Hide the Chat label for chatbot */
 .gradio-chatbot ~ label {
     display: none !important;
 }
-
 /* Row container */
 .gradio-row {
     gap: 16px !important;
 }
-
 /* Status message */
 .gradio-textbox, .gradio-number, .gradio-dropdown {
     margin-bottom: 16px !important;
 }
-
 @media (max-width: 600px) {
     .gradio-container {
         padding: 15px 10px !important;
@@ -482,7 +451,6 @@ label {
     }
 }
 """
-
 
 with gr.Blocks(title="HealthHub", css=custom_css) as demo:
     profile_state = gr.State({})

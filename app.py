@@ -247,7 +247,8 @@ custom_css = """
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 body {
-    background: linear-gradient(135deg, #2A8A8C 0%, #1B5E5F 100%) !important;
+    background: #3F9E91;
+    background: linear-gradient(135deg, rgba(63, 158, 145, 1) 23%, rgba(4, 194, 159, 1) 100%);
     margin: 0 !important;
     padding: 0 !important;
 }

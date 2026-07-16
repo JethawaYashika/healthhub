@@ -264,6 +264,10 @@ body {
     margin: 0 !important;
     padding: 0 !important;
 }
+.header-bg {
+    background-color: #E7FFFE5 !important; 
+    border-color:  #E7FFFE5 !important; 
+}
 .gradio-container {
     background: transparent !important;
     max-width: 950px;
@@ -512,7 +516,7 @@ with gr.Blocks(title="HealthHub", css=custom_css) as demo:
         signup_status = gr.Markdown("")
         signup_submit = gr.Button("Create Account & Start Chatting", variant="primary")
 
-    with gr.Group(visible=False) as chat_group:
+    with gr.Group(visible=False, elem_classes = "header-bg") as chat_group:
         profile_header = gr.HTML(visible=True)
         chatbot_ui = gr.Chatbot(label="Chat")
         msg_input = gr.Textbox(label="Your message", placeholder="Ask me something...")

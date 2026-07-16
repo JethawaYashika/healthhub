@@ -91,7 +91,8 @@ def check_login(username, password):
             gr.update(visible=False),  
             {},                        
             "Please enter both a username and password.",
-            [],                        
+            [],   
+            gr.update(value="")
         )
 
     if username not in users:
@@ -102,6 +103,7 @@ def check_login(username, password):
             {},
             "No account found for that username. Click Sign Up to create one.",
             [],
+            gr.update(value="")
         )
 
     if users[username]["password_hash"] != hash_password(password):
@@ -112,9 +114,12 @@ def check_login(username, password):
             {},
             "Incorrect password. Please try again.",
             [],
+            gr.update(value="")
         )
 
     profile = users[username]["profile"]
+    display_name = profile.get("name",username)
+    header_html = f""" <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 10px; margin-bottom: 10px;"> <span style="font-size: 1.1rem; font-weight: bold; color: #1B5E5F; font-family: sans-serif;"> Hi, {display_name}! </span> <img src="https://api.dicebear.com/7.x/adventurer/svg?seed={display_name}" alt="Profile" style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid #2A8A8C; background-color: white;" /> </div> """
     greeting = (
         f"Welcome back, {profile['name']}! I remember your goal is "
         f"**{profile['goal']}**. Ask me anything!"
@@ -127,6 +132,7 @@ def check_login(username, password):
         profile,
         "",
         history,
+        gr.update(value=header_html)
     )
 
 def start_signup():
@@ -148,6 +154,7 @@ def complete_signup(username, password, password_confirm, name, goal, height, we
             "Please fill in all fields including password.",
             {},
             [],
+            gr.update(value="")
         )
     
     if password != password_confirm:
@@ -157,6 +164,7 @@ def complete_signup(username, password, password_confirm, name, goal, height, we
             "Passwords do not match. Please try again.",
             {},
             [],
+            gr.update(value="")
         )
     
     if username in users:
@@ -166,6 +174,7 @@ def complete_signup(username, password, password_confirm, name, goal, height, we
             "That username is already taken. Please try a different one.",
             {},
             [],
+            gr.update(value="")
         )
     
     combined_prefs = list(dietary_prefs) if dietary_prefs else []
@@ -187,6 +196,7 @@ def complete_signup(username, password, password_confirm, name, goal, height, we
         "profile": profile,
     }
     save_users(users)
+    header_html = f""" <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 10px; margin-bottom: 10px;"> <span style="font-size: 1.1rem; font-weight: bold; color: #1B5E5F; font-family: sans-serif;"> Hi, {display_name}! </span> <img src="https://api.dicebear.com/7.x/adventurer/svg?seed={display_name}" alt="Profile" style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid #2A8A8C; background-color: white;" /> </div> """
 
     prefs_str = ", ".join(combined_prefs) if combined_prefs else "No specific preferences"
     greeting = (
@@ -201,7 +211,8 @@ def complete_signup(username, password, password_confirm, name, goal, height, we
         gr.update(visible=True),   
         "",                        
         profile,                   
-        history,                   
+        history,  
+        gr.update(value=header_html)
     )
 
 def respond(message, history, profile):
@@ -502,6 +513,7 @@ with gr.Blocks(title="HealthHub", css=custom_css) as demo:
         signup_submit = gr.Button("Create Account & Start Chatting", variant="primary")
 
     with gr.Group(visible=False) as chat_group:
+        profile_header = gr.HTML(visible=True)
         chatbot_ui = gr.Chatbot(label="Chat")
         msg_input = gr.Textbox(label="Your message", placeholder="Ask me something...")
         send_btn = gr.Button("Send")
@@ -509,7 +521,7 @@ with gr.Blocks(title="HealthHub", css=custom_css) as demo:
     login_btn.click(
         check_login,
         inputs=[username_input, password_input],
-        outputs=[auth_group, signup_group, chat_group, profile_state, auth_status, chatbot_ui],
+        outputs=[auth_group, signup_group, chat_group, profile_state, auth_status, chatbot_ui, profile_header]
     )
 
     signup_btn.click(
@@ -524,7 +536,7 @@ with gr.Blocks(title="HealthHub", css=custom_css) as demo:
     signup_submit.click(
         complete_signup,
         inputs=[signup_username_input, signup_password_input, signup_password_confirm, name_input, goal_input, height_input, weight_input, age_input, gender_input, dietary_input, other_dietary_input],
-        outputs=[signup_group, chat_group, signup_status, profile_state, chatbot_ui],
+        outputs=[signup_group, chat_group, signup_status, profile_state, chatbot_ui, profile_header]
     )
 
     send_btn.click(

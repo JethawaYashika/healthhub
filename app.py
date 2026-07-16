@@ -119,7 +119,7 @@ def check_login(username, password):
 
     profile = users[username]["profile"]
     display_name = profile.get("name",username)
-    header_html = f""" <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 10px; margin-bottom: 10px;"> <span style="font-size: 1.1rem; font-weight: bold; color: #1B5E5F; font-family: sans-serif;"> Hi, {display_name}! </span> <img src="https://api.dicebear.com/7.x/adventurer/svg?seed={display_name}" alt="Profile" style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid #2A8A8C; background-color: #E7FFFE5;" /> </div> """
+    header_html = f""" <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 10px; margin-bottom: 10px;"> <span style="font-size: 1.1rem; font-weight: bold; color: #1B5E5F; font-family: sans-serif;"> Hi, {display_name}! </span> <img src="https://api.dicebear.com/7.x/adventurer/svg?seed={display_name}" alt="Profile" style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid #2A8A8C; background-color: #E7FFE5;" /> </div> """
     greeting = (
         f"Welcome back, {profile['name']}! I remember your goal is "
         f"**{profile['goal']}**. Ask me anything!"
@@ -196,7 +196,7 @@ def complete_signup(username, password, password_confirm, name, goal, height, we
         "profile": profile,
     }
     save_users(users)
-    header_html = f""" <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 10px; margin-bottom: 10px;"> <span style="font-size: 1.1rem; font-weight: bold; color: #1B5E5F; font-family: sans-serif;"> Hi, {display_name}! </span> <img src="https://api.dicebear.com/7.x/adventurer/svg?seed={display_name}" alt="Profile" style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid #2A8A8C; background-color: #E7FFFE5;" /> </div> """
+    header_html = f""" <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 10px; margin-bottom: 10px;"> <span style="font-size: 1.1rem; font-weight: bold; color: #1B5E5F; font-family: sans-serif;"> Hi, {display_name}! </span> <img src="https://api.dicebear.com/7.x/adventurer/svg?seed={display_name}" alt="Profile" style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid #2A8A8C; background-color: #E7FFE5;" /> </div> """
 
     prefs_str = ", ".join(combined_prefs) if combined_prefs else "No specific preferences"
     greeting = (

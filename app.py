@@ -285,8 +285,8 @@ body {
 }
 /* All groups get cream background */
 .gradio-group {
-    background-color: #D8DDD8 !important;
-    border-color: #D8DDD8 !important;
+    background-color: #E7FFFE5 !important;
+    border-color: #E7FFFE5 !important;
 }
 .gradio-group .block, .dark .gradio-group, .dark .gradio-group .block {
     background-color: #D8DDD8 !important;

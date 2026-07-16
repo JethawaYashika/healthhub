@@ -265,8 +265,8 @@ body {
     padding: 0 !important;
 }
 .header-bg {
-    background-color: #E7FFFE5 !important; 
-    border-color:  #E7FFFE5 !important; 
+    background-color: #E7FFE5 !important; 
+    border-color:  #E7FFE5 !important; 
 }
 .gradio-container {
     background: transparent !important;

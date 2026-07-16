@@ -407,7 +407,7 @@ button[variant=secondary]:hover {
     min-height: 400px !important;
 }
 .gradio-chatbot > div {
-    background: #F5F5F3 !important;
+    background: #E7FFFE5 !important;
 }
 .gradio-chatbot .message-wrap {
     background: transparent !important;

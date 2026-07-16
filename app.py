@@ -247,7 +247,7 @@ custom_css = """
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 body {
-    background: linear-gradient(135deg, #1a4d4f 0%, #0d3335 100%) !important;
+    background: linear-gradient(135deg, #2A8A8C 0%, #1B5E5F 100%) !important;
     margin: 0 !important;
     padding: 0 !important;
 }
@@ -257,35 +257,29 @@ body {
     margin: 0 auto !important;
     padding: 30px 20px !important;
 }
-/* Header title with glow effect */
+/* Header title */
 .gradio-container > h1 {
     text-align: center;
-    color: #e8f4f5 !important;
+    color: white !important;
     font-size: 42px !important;
     font-weight: 600 !important;
     margin: 0 0 30px 0 !important;
     letter-spacing: 0.5px;
-    text-shadow: 
-        0 0 10px rgba(42, 138, 140, 0.8),
-        0 0 20px rgba(42, 138, 140, 0.5),
-        0 0 30px rgba(27, 94, 95, 0.4) !important;
 }
-/* All groups get cream background with subtle glow */
-.gradio-group,
-.gradio-group .block,
+/* All groups get cream background */
+.gradio-group {
+ .gradio-group,
+ .gradio-group .block,
 .dark .gradio-group, 
 .dark .gradio-group .block { 
     background-color: #D8DDD8 !important;
-    border-color: #D8DDD8 !important;
-    box-shadow: 0 0 20px rgba(42, 138, 140, 0.2) !important;
-}
+    border-color: #D8DDD8 !important;}
 /* Markdown headings */
 .gradio-markdown h3 {
     color: #1B5E5F !important;
     font-size: 18px !important;
     font-weight: 600 !important;
     margin: 0 0 20px 0 !important;
-    text-shadow: 0 0 8px rgba(42, 138, 140, 0.3) !important;
 }
 .gradio-markdown p {
     color: #2D2D2D !important;
@@ -298,11 +292,10 @@ input[type="password"],
 textarea {
     background: #1A1A1A !important;
     color: white !important;
-    border: 1px solid #2A8A8C !important;
+    border: none !important;
     border-radius: 10px !important;
     padding: 12px 16px !important;
     font-size: 15px !important;
-    box-shadow: inset 0 0 8px rgba(42, 138, 140, 0.2) !important;
 }
 input::placeholder,
 textarea::placeholder {
@@ -312,29 +305,25 @@ input:focus,
 textarea:focus {
     outline: none !important;
     border: 2px solid #2A8A8C !important;
-    box-shadow: 
-        inset 0 0 8px rgba(42, 138, 140, 0.2),
-        0 0 12px rgba(42, 138, 140, 0.5) !important;
+    box-shadow: 0 0 8px rgba(42, 138, 140, 0.3) !important;
 }
 /* Number inputs */
 input[type="number"] {
     background: #1A1A1A !important;
     color: white !important;
-    border: 1px solid #2A8A8C !important;
+    border: none !important;
     border-radius: 10px !important;
     padding: 12px 16px !important;
     font-size: 15px !important;
-    box-shadow: inset 0 0 8px rgba(42, 138, 140, 0.2) !important;
 }
 /* Dropdowns */
 select {
     background: #1A1A1A !important;
     color: white !important;
-    border: 1px solid #2A8A8C !important;
+    border: none !important;
     border-radius: 10px !important;
     padding: 12px 16px !important;
     font-size: 15px !important;
-    box-shadow: inset 0 0 8px rgba(42, 138, 140, 0.2) !important;
 }
 select option {
     background: #1A1A1A !important;
@@ -359,13 +348,11 @@ select option {
 .gradio-checkboxgroup label:hover {
     border-color: #2A8A8C !important;
     background: #F8F8F8 !important;
-    box-shadow: 0 0 12px rgba(42, 138, 140, 0.3) !important;
 }
 .gradio-checkboxgroup input[type="checkbox"]:checked + label {
     background: #2A8A8C !important;
     color: white !important;
     border-color: #2A8A8C !important;
-    box-shadow: 0 0 12px rgba(42, 138, 140, 0.5) !important;
 }
 /* Primary buttons */
 .gradio-button {
@@ -378,16 +365,11 @@ select option {
     font-weight: 600 !important;
     cursor: pointer !important;
     transition: all 0.3s ease !important;
-    box-shadow: 
-        0 4px 12px rgba(42, 138, 140, 0.3),
-        0 0 20px rgba(42, 138, 140, 0.2) !important;
-    text-shadow: 0 0 8px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 4px 12px rgba(42, 138, 140, 0.3) !important;
 }
 .gradio-button:hover {
     background: #1B5E5F !important;
-    box-shadow: 
-        0 6px 16px rgba(27, 94, 95, 0.4),
-        0 0 25px rgba(42, 138, 140, 0.4) !important;
+    box-shadow: 0 6px 16px rgba(27, 94, 95, 0.4) !important;
     transform: translateY(-1px) !important;
 }
 /* Secondary buttons */
@@ -395,26 +377,21 @@ button[variant="secondary"] {
     background: white !important;
     color: #2A8A8C !important;
     border: 2px solid #2A8A8C !important;
-    box-shadow: 0 0 12px rgba(42, 138, 140, 0.2) !important;
 }
 button[variant="secondary"]:hover {
     background: #2A8A8C !important;
     color: white !important;
-    box-shadow: 0 0 20px rgba(42, 138, 140, 0.4) !important;
 }
-/* Chat styling with glow */
+/* Chat styling - most important */
 .gradio-chatbot {
-    background: #1a1a1a !important;
+    background: #F5F5F3 !important;
     border-radius: 14px !important;
-    border: 1px solid #2A8A8C !important;
+    border: none !important;
     padding: 20px !important;
     min-height: 400px !important;
-    box-shadow: 
-        inset 0 0 15px rgba(42, 138, 140, 0.1),
-        0 0 20px rgba(42, 138, 140, 0.2) !important;
 }
 .gradio-chatbot > div {
-    background: #1a1a1a !important;
+    background: #F5F5F3 !important;
 }
 .gradio-chatbot .message-wrap {
     background: transparent !important;
@@ -428,36 +405,25 @@ button[variant="secondary"]:hover {
     line-height: 1.5 !important;
 }
 .gradio-chatbot .message.user {
-    background: #1a3f42 !important;
-    color: #b8e0e3 !important;
+    background: #7FB3D5 !important;
+    color: white !important;
     margin-left: auto !important;
     margin-right: 0 !important;
     text-align: left !important;
-    border: 1px solid #2A8A8C !important;
-    box-shadow: 
-        0 0 12px rgba(42, 138, 140, 0.4),
-        inset 0 0 6px rgba(42, 138, 140, 0.2) !important;
-    text-shadow: 0 0 4px rgba(42, 138, 140, 0.5) !important;
 }
 .gradio-chatbot .message.assistant {
-    background: #1a2a2b !important;
-    color: #c8e6e8 !important;
+    background: #B8DFE8 !important;
+    color: #2D2D2D !important;
     margin-right: auto !important;
     margin-left: 0 !important;
     text-align: left !important;
-    border: 1px solid #3a9a9c !important;
-    box-shadow: 
-        0 0 12px rgba(42, 138, 140, 0.3),
-        inset 0 0 6px rgba(42, 138, 140, 0.15) !important;
-    text-shadow: 0 0 4px rgba(42, 138, 140, 0.4) !important;
 }
 /* Labels */
 label {
-    color: #e8f4f5 !important;
+    color: #2D2D2D !important;
     font-weight: 600 !important;
     font-size: 14px !important;
     margin-bottom: 8px !important;
-    text-shadow: 0 0 6px rgba(42, 138, 140, 0.3) !important;
 }
 /* Hide the Chat label for chatbot */
 .gradio-chatbot ~ label {

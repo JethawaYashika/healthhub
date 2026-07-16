@@ -5,7 +5,7 @@ import hashlib
 from huggingface_hub import InferenceClient
 from sentence_transformers import SentenceTransformer
 import torch
-
+#hello
 hf_token = os.environ.get("HF_TOKEN")
 client = InferenceClient("Qwen/Qwen2.5-7B-Instruct", token=hf_token)
 

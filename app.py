@@ -268,11 +268,23 @@ body {
     background-color: #E7FFE5 !important; 
     border-color:  #E7FFE5 !important; 
 }
+#chat-header-group,
+#chat-header-group.block,
+#chat-header-group .block,
+#profile-header {
+    background-color: #E7FFE5 !important;
+    border-color: #E7FFE5 !important;
+    border-radius: 12px !important;
+}
 .gradio-container {
     background: transparent !important;
     max-width: 950px;
     margin: 0 auto !important;
     padding: 30px 20px !important;
+}
+.gradio-chatbot .wrap,
+.gradio-chatbot .bubble-wrap {
+    background: #E7FFE5 !important;
 }
 /* Header title */
 .gradio-container > h1 {
@@ -285,8 +297,8 @@ body {
 }
 /* All groups get cream background */
 .gradio-group {
-    background-color: #E7FFFE5 !important;
-    border-color: #E7FFFE5 !important;
+    background-color: #E7FFE5 !important;
+    border-color: #E7FFE5 !important;
 }
 .gradio-group .block, .dark .gradio-group, .dark .gradio-group .block {
     background-color: #D8DDD8 !important;
@@ -400,14 +412,14 @@ button[variant=secondary]:hover {
 }
 /* Chat styling */
 .gradio-chatbot {
-    background: #E7FFFE5 !important;
+    background: #E7FFE5 !important;
     border-radius: 14px !important;
     border: none !important;
     padding: 20px !important;
     min-height: 400px !important;
 }
 .gradio-chatbot > div {
-    background: #E7FFFE5 !important;
+    background: #E7FFE5 !important;
 }
 .gradio-chatbot .message-wrap {
     background: transparent !important;
@@ -516,8 +528,8 @@ with gr.Blocks(title="HealthHub", css=custom_css) as demo:
         signup_status = gr.Markdown("")
         signup_submit = gr.Button("Create Account & Start Chatting", variant="primary")
 
-    with gr.Group(visible=False, elem_classes = "header-bg") as chat_group:
-        profile_header = gr.HTML(visible=True)
+    with gr.Group(visible=False, elem_classes = "header-bg", elem_id = "chat-header-group") as chat_group:
+        profile_header = gr.HTML(visible=True, elem_id="profile-header")
         chatbot_ui = gr.Chatbot(label="Chat")
         msg_input = gr.Textbox(label="Your message", placeholder="Ask me something...")
         send_btn = gr.Button("Send")
